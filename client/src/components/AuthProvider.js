@@ -31,6 +31,7 @@ export default function AuthProvider({children}) {
         setUser(data.user);
         // localStorage에 token을 저장한다.
         localStorage.setItem("token", data.token);
+        // Feed로 이동한다.
         callback()
     }
 
