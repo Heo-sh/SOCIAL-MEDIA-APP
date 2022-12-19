@@ -8,7 +8,30 @@ export default function ArticleCreate() {
     const [text, setText] = useState("");
 
     function handleSubmit(e) {
+        e.preventDefault();
 
+        const formData = new FormData(e.target);
+
+        fetch(`${process.env.REACT_APP_SERVER}/articles`, {
+            method: "POST",
+            headers: {
+                "Authorization": `Bearer ${localStorage.getItem("token")}`
+            },
+            body: formData
+        })
+        .then(res => {
+            if (!res.ok) {
+                throw res;
+            }
+            return res.json()
+        })
+        .then(data => {
+            // feed page로 이동한다.
+            navigate("/", { replace: true });
+        })
+        .catch(error => {
+            alert("Something's broken");
+        })
     }
 
     console.log(files);

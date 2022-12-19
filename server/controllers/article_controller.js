@@ -1,7 +1,6 @@
 const { Follow, Article, Favorite } = require("../models/model");
 const formidable = require("formidable");
 const fs = require("fs");
-const { query } = require("express");
 
 // # 게시물 등록
 exports.create = async (req, res, next) => {
@@ -31,6 +30,7 @@ exports.create = async (req, res, next) => {
                 const newName = photo.newFilename + "." + ext;
                 const newPath = `${__dirname}/../data/articles/${newName}`;
                 fs.renameSync(oldPath, newPath);
+                // or fs.copyFileSync(oldPath, newPath);
 
                 return newName;
             })
