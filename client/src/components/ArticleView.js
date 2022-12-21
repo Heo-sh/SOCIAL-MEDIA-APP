@@ -22,9 +22,10 @@ export default function ArticleView() {
         .finally(() => setIsLoaded(true))
     }, [])
 
+    // 좋아요
     function favorite(articleId) {
         fetch(`${process.env.REACT_APP_SERVER}/articles/${articleId}/favorite`, {
-            method: 'POST',
+            method: 'POST', // 좋아요 data를 생성
             headers: { 'Authorization': `Bearer ${localStorage.getItem("token")}` }
           })
           .then(res => {
@@ -32,6 +33,7 @@ export default function ArticleView() {
               throw res;
             }
             const editedArticle = {...article, isFavorite: true, favoriteCount: article.favoriteCount + 1 };
+            // article state를 update한다.
             setArticle(editedArticle);
           })
           .catch(error => {
@@ -39,6 +41,7 @@ export default function ArticleView() {
           })
     }
 
+    // 좋아요 취소
     function unfavorite(articleId) {
         fetch(`${process.env.REACT_APP_SERVER}/articles/${articleId}/favorite`, {
             method: 'DELETE',
@@ -49,6 +52,7 @@ export default function ArticleView() {
               throw res;
             }
             const editedArticle = {...article, isFavorite: false, favoriteCount: article.favoriteCount - 1 };
+            // article update
             setArticle(editedArticle);
           })
           .catch(error => {
@@ -56,6 +60,7 @@ export default function ArticleView() {
           })
     }
 
+    // 게시물 삭제
     function deleteArticle(articleId) {
         fetch(`${process.env.REACT_APP_SERVER}/articles/${articleId}`, {
             method: 'DELETE',
@@ -65,6 +70,7 @@ export default function ArticleView() {
             if (!res.ok) {
               throw res;
             }
+            // 게시물 삭제 후, 피드로 이동
             navigate("/", { replace: true })
           })
           .catch(error => {
