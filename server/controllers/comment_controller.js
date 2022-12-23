@@ -1,4 +1,3 @@
-const { Query } = require("mongoose");
 const {Comment, FavoriteComment} = require("../models/model");
 
 // # comment 작성
@@ -40,7 +39,7 @@ exports.comment_list = async (req, res, next) => {
             .skip(req.query.skip)
             .lean();
 
-        // comment data에 ifFavorite 속성을 추가한다.
+        // comment data에 isFavorite 속성을 추가한다.
         for (let comment of comments) {
             const favoriteComment = await FavoriteComment
                 .findOne({user: loginUser._id, comment: comment._id});

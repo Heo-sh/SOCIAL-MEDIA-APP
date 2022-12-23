@@ -83,6 +83,7 @@ export default function Feed() {
                 throw res;
             }
             
+            // articles update
             const updatedArticles = articles.filter(article => articleId !== article._id);
 
             setArticles(updatedArticles);
