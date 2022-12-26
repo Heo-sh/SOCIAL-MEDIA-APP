@@ -31,7 +31,7 @@ exports.profile = async (req, res, next) => {
             isFollowing: !!follow,
             followersCount,
             followingCount,
-            articlesCount
+            articlesCount,
         }
 
         res.json(profile);

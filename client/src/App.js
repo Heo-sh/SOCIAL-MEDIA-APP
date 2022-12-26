@@ -13,6 +13,8 @@ import Register from "./components/Register";
 import Profile from "./components/Profile";
 import Accounts from "./components/Accounts";
 import NotFound from "./components/NotFound";
+import FollowersList from "./components/FollowersList";
+import FollowingList from "./components/FollowingList";
 
 function App() {
   return (
@@ -34,6 +36,8 @@ function App() {
               <Route path="comments" element={<Comments />} />
             </Route>
             <Route path="profile/:username" element={<Profile />} />
+            <Route path="profile/:username/followers" element={<FollowersList />} />
+            <Route path="profile/:username/following" element={<FollowingList />} />
             <Route path="accounts/edit" element={<Accounts />} />
           </Route>
 
