@@ -26,6 +26,17 @@ export default function ArticleList() {
         .finally(() => setIsLoaded(true))
     }, [skip])
 
+    // *** skip, limit ***
+    // limit = 10 한번 요청할 때 10개의 게시물을 가져온다.
+
+    // ex) 1 - 100번 까지의 data가 있다.
+    // 처음에는 1 - 10번 까지의 게시물을 db에 요청한다. => skip은 0이다.
+    // 그 후에는 11 - 20번 까지의 게시물을 요청한다. => skip은 10이다.
+    // 1 - 20번 까지의 게시물을 건너뛰고 21 - 30번 까지의 게시물을 요청한다. => skip은 20이다.
+
+    // skip: 몇 개의 데이터를 건너 뛸 것인지 정하는 변수
+    // limit: 한 번 요청시에 가져오는 데이터의 갯수
+
     return (
         <>
             {/* 검색창 (Link button) */}

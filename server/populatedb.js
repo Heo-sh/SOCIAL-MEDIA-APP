@@ -12,14 +12,142 @@ const {User, Article, Follow} = require("./models/model");
 const crypto = require("crypto")
 const fs = require("fs");
 
-// user 생성 함수
-async function createUser(username, email, password = '123') {}
+// user 생성 함수 - 회원가입 Logic이랑 비슷하다.
+async function createUser(username, email, password = '123') { // username, email, password로 인자가 3개인 함수
+    // 비밀번호 암호화
+    const salt = crypto.randomBytes(16).toString("hex");
+    const hashedPassword = crypto.pbkdf2Sync(password, salt, 310000, 32, "sha256").toString("hex")
+
+    // 프로필 이미지 생성
+    const files = fs.readdirSync(`./seeds/profiles`); // readdirSync으로 seeds안에 있는 profiles를 읽는다.
+    const file = files.find(file => file.startsWith(username));
+    // 파일의 이름을 랜덤으로 생성한다.
+    const newFile = `${crypto.randomBytes(24).toString("hex")}.${file.split(".")[1]}`;
+
+    const oldPath = `./seeds/profiles/${file}`;
+    const newPath = `./data/users/${newFile}`; // seeds/profiles에서 data/users로 이동시킨다.
+
+    fs.copyFileSync(oldPath, newPath); 
+
+    // DB Query - model의 instence를 만들어 user data에 save시킨다.
+    const user = new User({
+        username,
+        email,
+        password: hashedPassword,
+        salt,
+        bio: `I'm ${username}`,
+        image: newFile
+    })
+    await user.save();
+
+    return console.log(user);
+}
 
 // article 생성 함수
-async function createArticle(username, postId) {}
+async function createArticle(username, postId) {
+
+    // 게시물의 작성자를 정하기 위한 변수
+    const user = await User.findOne({username});
+
+    // 이미지를 다루기 위한 변수들
+    const files = fs.readdirSync(`./seeds/${username}/`);
+    const fileList = files.filter(file => file.startsWith(username + postId));
+
+    const newFiles = fileList.map(file => {
+        const newFile = `${crypto.randomBytes(24).toString("hex")}.${file.split(".")[1]}`;
+
+        const oldPath = `./seeds/${username}/${file}`;
+        const newPath = `./data/articles/${newFile}`;
+        fs.copyFileSync(oldPath, newPath);
+
+        return newFile;
+    })
+
+    // DB Query - 새로운 articles를 저장한다.
+    const article = new Article({
+        // 게시물의 내용을 생성
+        description: `${username}'s photo!`,
+        photos: newFiles,
+        user: user._id,
+        created: Date.now()
+    })
+    await article.save();
+
+    return console.log(article);
+}
 
 // Follow 생성 함수
-async function createFollow(follower, following) {}
+async function createFollow(follower, following) {
+    const _follower = await User.findOne({username: follower});
+    const _following = await User.findOne({username: following});
+
+    // DB Query
+    const follow = new Follow({
+        follower: _follower._id,
+        following: _following._id
+    })
+
+    await follow.save();
+
+    return console.log(follow);
+}
 
 // 위의 함수들을 호출하는 함수
-async function createData() {}
+async function createData() {
+    try {
+        await mongoose.connect(mongoDB);
+
+        // User를 먼저 생성을 한 후 Follow, Article을 생성해줘야한다.
+        await createUser("bunny", "bunny@example.com");
+        await createUser("cat", "cat@example.com");
+        await createUser("bird", "bird@example.com");
+        await createUser("duck", "duck@example.com");
+        await createUser("dog", "dog@example.com");
+        await createUser("pug", "pug@example.com");
+        await createUser("quokka", "quokka@example.com");
+        await createUser("monkey", "monkey@example.com");
+
+        await createFollow("pug", "bunny");
+        await createFollow("bunny", "cat");
+        await createFollow("bunny", "quokka");
+        await createFollow("bunny", "dog");
+
+        await createArticle("bunny", "1")
+        await createArticle("bunny", "2")
+        await createArticle("bunny", "3")
+
+        await createArticle("cat", "1")
+        await createArticle("cat", "2")
+        await createArticle("cat", "3")
+        await createArticle("cat", "4")
+
+        await createArticle("bird", "1")
+
+        await createArticle("duck", "1")
+        await createArticle("duck", "2")
+        await createArticle("duck", "3")
+
+        await createArticle("dog", "1")
+        await createArticle("dog", "2")
+        await createArticle("dog", "3")
+        await createArticle("dog", "4")
+
+        await createArticle("pug", "1")
+        await createArticle("pug", "2")
+        await createArticle("pug", "3")
+
+        await createArticle("quokka", "1")
+        await createArticle("quokka", "2")
+        await createArticle("quokka", "3")
+
+        await createArticle("monkey", "1")
+        await createArticle("monkey", "2")
+        await createArticle("monkey", "3");
+
+        mongoose.connection.close();
+    } catch (error) {
+        console.log(error);``
+    }
+}
+
+createData();
